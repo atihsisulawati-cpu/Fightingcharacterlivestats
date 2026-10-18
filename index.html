@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fighting Character Live Stats</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #241442, #090914 65%);
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.logo {
+  width: 75px;
+  height: 75px;
+  margin: auto auto 15px;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  font-size: 38px;
+}
+
+h1 {
+  font-size: 28px;
+  margin: 0 0 10px;
+}
+
+.subtitle {
+  color: #bcb4d5;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.card {
+  padding: 22px;
+  background: #1b1630;
+  border: 1px solid #393052;
+  border-radius: 20px;
+}
+
+.label {
+  color: #bcb4d5;
+  font-size: 13px;
+}
+
+.number {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 15px 0;
+  overflow-wrap: anywhere;
+}
+
+.green {
+  color: #4ade80;
+}
+
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+}
+
+.status {
+  text-align: center;
+  color: #c4b5fd;
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+.note {
+  color: #a9a0bf;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 25px;
+}
+
+@media (max-width: 430px) {
+  body {
+    padding: 14px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">⚔️</div>
+    <h1>Fighting Character</h1>
+    <div class="subtitle">Live Visitor Statistics</div>
+  </header>
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="label">
+        <span class="dot"></span>
+        PENGUNJUNG AKTIF
+      </div>
+
+      <div class="number green" id="active">0</div>
+
+      <div class="label">
+        Aktif dalam 45 detik terakhir
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">TOTAL KUNJUNGAN</div>
+
+      <div class="number" id="total">0</div>
+
+      <div class="label">
+        Total sesi yang tercatat
+      </div>
+    </div>
+
+  </div>
+
+  <div class="status" id="status">
+    Menghubungkan ke server...
+  </div>
+
+  <div class="note">
+    Statistik ini menghitung browser yang membuka game
+    Fighting Character dan memasang kode pelacak.
+    Angka tidak akan bertambah sampai server dan pelacak
+    terpasang dengan benar.
+  </div>
+
+</div>
+
+<script>
+async function updateStats() {
+  const status = document.getElementById("status");
+
+  try {
+    const response = await fetch("/api/stats", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Server tidak merespons");
+    }
+
+    const data = await response.json();
+
+    document.getElementById("active").textContent =
+      data.activeVisitors ?? data.active ?? 0;
+
+    document.getElementById("total").textContent =
+      data.totalVisits ?? data.total ?? 0;
+
+    status.textContent =
+      "🟢 Terhubung • Diperbarui " +
+      new Date().toLocaleTimeString("id-ID");
+
+  } catch (error) {
+    status.textContent =
+      "⚠️ Server belum terhubung. Jalankan server Node.js.";
+  }
+}
+
+updateStats();
+setInterval(updateStats, 5000);
+</script>
+
+</body>
+</html>
